@@ -1,0 +1,40 @@
+metricbeat.modules:
+
+#------------------------------- System Module -------------------------------
+- module: system
+  metricsets:
+    # CPU stats
+    - cpu
+    # System Load stats
+    - load
+    # Per CPU core stats
+    - core
+    # IO stats
+    - diskio
+    # Per filesystem stats
+    - filesystem
+    # File system summary stats
+    - fsstat
+    # Memory stats
+    - memory
+    # Network stats
+    - network
+    # Per process stats
+    #- process
+    # Per process stats
+    #- process
+    # Sockets (linux only)
+    #- socket
+  enabled: true
+  period: 10s
+  processes: ['.*']
+  
+- module: docker
+  metricsets: ["container", "cpu", "diskio", "healthcheck", "info", "memory", "network"]
+  hosts: ["unix:///var/run/docker.sock"]
+  enabled: true
+  period: 10s
+
+output.elasticsearch:
+  # Array of hosts to connect to.
+  hosts: ["elasticsearch:9200"]
