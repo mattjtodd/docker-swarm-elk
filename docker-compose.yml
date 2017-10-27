@@ -11,12 +11,11 @@ volumes:
 services:
 
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:5.6.0
+    image: docker.elastic.co/elasticsearch/elasticsearch:5.6.3
     environment:
       - "ES_JAVA_OPTS=-Xms256m -Xmx256m"
       - "network.host=0.0.0.0"
       - "discovery.zen.ping.unicast.hosts=elasticsearch"
-      - "discovery.zen.minimum_master_nodes=2"
       - "xpack.security.enabled=false"
       - "xpack.monitoring.enabled=true"
       - "xpack.watcher.enabled=false"
@@ -32,24 +31,17 @@ services:
     deploy:
       mode: global
       endpoint_mode: dnsrr
-      placement:
-        constraints:
-          - node.role == worker
   kibana:
-    image: docker.elastic.co/kibana/kibana:5.6.0
+    image: docker.elastic.co/kibana/kibana:5.6.3
     networks:
       - elasticsearch
     ports:
       - "5601:5601"
     environment:
       - "xpack.security.enabled=false"
-    deploy:
-      placement:
-        constraints:
-          - node.role == worker
 
   metricbeat:
-    image: docker.elastic.co/beats/metricbeat:5.6.0
+    image: docker.elastic.co/beats/metricbeat:5.6.3
     command: metricbeat -e -c /metricbeat.yml -system.hostfs=/hostfs 
     user: root
     networks:
@@ -65,7 +57,7 @@ services:
       mode: global
 
   grafana:
-    image: grafana/grafana
+    image: grafana/grafana:4.6.0
     networks:
       - elasticsearch
     ports:
@@ -74,10 +66,6 @@ services:
       - GF_SECURITY_ADMIN_PASSWORD=admin
       - GF_DASHBOARD_JSON_ENABLED=true
       - GF_DASHBOARD_JSON_PATH=/opt/grafana
-    deploy:
-      placement:
-        constraints:
-          - node.role == worker
     volumes:
       - grafana:/var/lib/grafana
 
