@@ -2,5 +2,5 @@
 
 docker config create metricbeat.yml metricbeat/metricbeat.yml
 
-docker stack deploy -c docker-compose.yml "elasicserch$1"
+docker stack deploy -c docker-compose.yml "elasticserch$1"
 
