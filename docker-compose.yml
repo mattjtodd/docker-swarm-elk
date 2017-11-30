@@ -3,6 +3,8 @@ version: "3.3"
 networks:
   elasticsearch:
     driver: overlay
+  unixbench:
+    driver: overlay
 
 volumes:
   esdata:
@@ -29,6 +31,11 @@ services:
     volumes:
       - esdata:/usr/share/elasticsearch/data
     deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 512M 
       mode: global
       endpoint_mode: dnsrr
 
@@ -113,20 +120,13 @@ services:
 
   unixbench:
     image: tutum/unixbench
+    networks:
+      - unixbench
     logging:
       driver: gelf
       options:
         gelf-address: "udp://127.0.0.1:12201"
         tag: "unixbench"
-    deploy:
-      replicas: 1
-      resources:
-        limits:
-          cpus: ${PORTAINER_CPUS:-0}
-          memory: ${PORTAINER_MEMORY:-0}
-        reservations:
-          cpus: ${PORTAINER_CPUS:-0}
-          memory: ${PORTAINER_MEMORY:-0}
     
 configs:
   metricbeat.yml:
