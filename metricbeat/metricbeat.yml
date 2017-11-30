@@ -1,40 +1,125 @@
+########################## Metricbeat Configuration ###########################
+
+# This file is a full configuration example documenting all non-deprecated
+# options in comments. For a shorter configuration example, that contains only
+# the most common options, please see metricbeat-host.yml in the same directory.
+#
+# You can find the full configuration reference here:
+# https://www.elastic.co/guide/en/beats/metricbeat/index.html
+
+#============================  Config Reloading ===============================
+
+# Config reloading allows to dynamically load modules. Each file which is
+# monitored must contain one or multiple modules as a list.
+metricbeat.config.modules:
+
+  # Glob pattern for configuration reloading
+  path: ${path.config}/conf.d/*.yml
+
+  # Period on which files under path should be checked for changes
+  reload.period: 10s
+
+  # Set to true to enable config reloading
+  reload.enabled: false
+
+# Maximum amount of time to randomly delay the start of a metricset. Use 0 to
+# disable startup delay.
+metricbeat.max_start_delay: 10s
+
+#==========================  Modules configuration ============================
 metricbeat.modules:
+
+#------------------------------- Docker Module -------------------------------
+- module: docker
+  metricsets: ["container", "cpu", "diskio", "healthcheck", "info", "memory", "network"]
+  hosts: ["unix:///var/run/docker.sock"]
+  period: 10s
 
 #------------------------------- System Module -------------------------------
 - module: system
   metricsets:
-    # CPU stats
-    - cpu
-    # System Load stats
-    - load
-    # Per CPU core stats
-    - core
-    # IO stats
-    - diskio
-    # Per filesystem stats
-    - filesystem
-    # File system summary stats
-    - fsstat
-    # Memory stats
-    - memory
-    # Network stats
-    - network
-    # Per process stats
-    #- process
-    # Per process stats
-    #- process
-    # Sockets (linux only)
-    #- socket
+    - cpu             # CPU usage
+    - filesystem      # File system usage for each mountpoint
+    - fsstat          # File system summary metrics
+    - load            # CPU load averages
+    - memory          # Memory usage
+    - network         # Network IO
+    #- process         # Per process metrics
+    - process_summary # Process summary
+    #- core           # Per CPU core usage
+    #- diskio         # Disk IO
+    - socket         # Sockets and connection info (linux only)
   enabled: true
   period: 10s
   processes: ['.*']
-  
-- module: docker
-  metricsets: ["container", "cpu", "diskio", "healthcheck", "info", "memory", "network"]
-  hosts: ["unix:///var/run/docker.sock"]
-  enabled: true
-  period: 10s
 
+  # Configure the metric types that are included by these metricsets.
+  cpu.metrics:  ["percentages", "normalized_percentages"]  # The other available options are normalized_percentages and ticks.
+  core.metrics: ["percentages", "normalized_percentages"]  # The other available option is ticks.
+
+#================================ General ======================================
+
+# The name of the shipper that publishes the network data. It can be used to group
+# all the transactions sent by a single shipper in the web interface.
+# If this options is not defined, the hostname is used.
+name: host
+
+# Internal queue configuration for buffering events to be published.
+queue:
+  # Queue type by name (default 'mem')
+  # The memory queue will present all available events (up to the outputs
+  # bulk_max_size) to the output, the moment the output is ready to server
+  # another batch of events.
+  mem:
+    # Max number of events the queue can buffer.
+    events: 4096
+
+    # Hints the minimum number of events stored in the queue,
+    # before providing a batch of events to the outputs.
+    # A value of 0 (the default) ensures events are immediately available
+    # to be sent to the outputs.
+    flush.min_events: 2048
+
+    # Maximum duration after which events are available to the outputs,
+    # if the number of events stored in the queue is < min_flush_events.
+    flush.timeout: 1s
+
+#================================ Outputs ======================================
+
+# Configure what output to use when sending the data collected by the beat.
+
+#-------------------------- Elasticsearch output -------------------------------
 output.elasticsearch:
+  # Boolean flag to enable or disable the output module.
+  #enabled: true
+
   # Array of hosts to connect to.
+  # Scheme and port can be left out and will be set to the default (http and 9200)
+  # In case you specify and additional path, the scheme is required: http://localhost:9200/path
+  # IPv6 addresses should always be defined as: https://[2001:db8::1]:9200
   hosts: ["elasticsearch:9200"]
+
+  # Set gzip compression level.
+  compression_level: 3
+
+
+#============================== Template =====================================
+
+# A template is used to set the mapping in Elasticsearch
+# By default template loading is enabled and the template is loaded.
+# These settings can be adjusted to load your own template or overwrite existing ones.
+
+# Elasticsearch template settings
+setup.template.settings:
+
+  index.number_of_shards: 1
+  index.number_of_replicas: ${NUMBER_OF_REPLICAS:-0}
+
+#================================ Logging ======================================
+# There are three options for the log output: syslog, file, stderr.
+# Under Windows systems, the log files are per default sent to the file output,
+# under all other system per default to syslog.
+
+# Logging to rotating files files. Set logging.to_files to false to disable logging to
+# files.
+logging.to_files: false

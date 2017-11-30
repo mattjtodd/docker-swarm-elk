@@ -70,7 +70,68 @@ services:
     volumes:
       - grafana:/var/lib/grafana
 
+  portainer:
+    image: portainer/portainer
+    command: --no-auth --host=unix:///var/run/docker.sock
+    ports:
+      - 9000:9000
+    networks:
+      - elasticsearch
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
+    deploy:
+      placement:
+        constraints:
+         - node.role == manager
+
+  logstash:
+    image: docker.elastic.co/logstash/logstash:6.0.0
+    command: sh -c "logstash -f /logstash/logstash.conf"
+    environment:
+      - "ELASTICSEARCH_URL=http://elasticsearch:9200"
+      - "xpack.security.enabled=false"
+      - "xpack.monitoring.enabled=true"
+    networks:
+      - elasticsearch
+    ports:
+      - "12201:12201/udp"
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
+    configs:
+      - source: logstash-template
+        target: /logstash/logstash-template.json
+      - source: logstash-conf
+        target: /logstash/logstash.conf
+
+  unixbench:
+    image: tutum/unixbench
+    logging:
+      driver: gelf
+      options:
+        gelf-address: "udp://127.0.0.1:12201"
+        tag: "unixbench"
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: ${PORTAINER_CPUS:-0}
+          memory: ${PORTAINER_MEMORY:-0}
+        reservations:
+          cpus: ${PORTAINER_CPUS:-0}
+          memory: ${PORTAINER_MEMORY:-0}
+    
 configs:
   metricbeat.yml:
     external: true
-
+  logstash-template:
+    external: true
+  logstash-conf:  
+    external: true
