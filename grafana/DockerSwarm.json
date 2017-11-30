@@ -34,7 +34,7 @@
         {
           "cacheTimeout": null,
           "colorBackground": false,
-          "colorValue": false,
+          "colorValue": true,
           "colors": [
             "rgba(50, 172, 45, 0.97)",
             "rgba(237, 129, 40, 0.89)",
@@ -43,7 +43,7 @@
           "datasource": "Metricbeat",
           "editable": true,
           "error": false,
-          "format": "percent",
+          "format": "percentunit",
           "gauge": {
             "maxValue": 100,
             "minValue": 0,
@@ -84,7 +84,7 @@
             "fillColor": "rgba(31, 118, 189, 0.18)",
             "full": false,
             "lineColor": "rgb(31, 120, 193)",
-            "show": false
+            "show": true
           },
           "tableColumn": "",
           "targets": [
@@ -136,7 +136,7 @@
         {
           "cacheTimeout": null,
           "colorBackground": false,
-          "colorValue": false,
+          "colorValue": true,
           "colors": [
             "rgba(50, 172, 45, 0.97)",
             "rgba(237, 129, 40, 0.89)",
@@ -146,7 +146,7 @@
           "decimals": 2,
           "editable": true,
           "error": false,
-          "format": "percent",
+          "format": "percentunit",
           "gauge": {
             "maxValue": 100,
             "minValue": 0,
@@ -185,9 +185,9 @@
           "span": 4,
           "sparkline": {
             "fillColor": "rgba(31, 118, 189, 0.18)",
-            "full": false,
+            "full": true,
             "lineColor": "rgb(31, 120, 193)",
-            "show": false
+            "show": true
           },
           "tableColumn": "",
           "targets": [
@@ -197,7 +197,7 @@
                   "field": "@timestamp",
                   "id": "2",
                   "settings": {
-                    "interval": "auto",
+                    "interval": "10s",
                     "min_doc_count": 0,
                     "trimEdges": 0
                   },
@@ -210,11 +210,11 @@
               "intervalFactor": 1,
               "metrics": [
                 {
-                  "field": "system.cpu.user.pct",
+                  "field": "system.cpu.total.norm.pct",
                   "id": "1",
                   "meta": {},
                   "settings": {},
-                  "type": "max"
+                  "type": "avg"
                 }
               ],
               "query": "metricset.module:system AND metricset.name:cpu",
@@ -249,7 +249,7 @@
           "decimals": 2,
           "editable": true,
           "error": false,
-          "format": "percent",
+          "format": "percentunit",
           "gauge": {
             "maxValue": 100,
             "minValue": 0,
@@ -874,7 +874,7 @@
     "list": []
   },
   "time": {
-    "from": "now-15m",
+    "from": "now-1h",
     "to": "now"
   },
   "timepicker": {
@@ -904,6 +904,5 @@
   },
   "timezone": "browser",
   "title": "Docker Swarm",
-  "version": 2
+  "version": 4
 }
-
