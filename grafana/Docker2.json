@@ -83,7 +83,7 @@
                   "field": "@timestamp",
                   "id": "2",
                   "settings": {
-                    "interval": "1m",
+                    "interval": "auto",
                     "min_doc_count": 0,
                     "trimEdges": 0
                   },
@@ -348,7 +348,7 @@
                   "field": "@timestamp",
                   "id": "2",
                   "settings": {
-                    "interval": "10s",
+                    "interval": "auto",
                     "min_doc_count": 0,
                     "trimEdges": 0
                   },
@@ -574,5 +574,5 @@
   },
   "timezone": "",
   "title": "Docker Containers",
-  "version": 2
+  "version": 3
 }
