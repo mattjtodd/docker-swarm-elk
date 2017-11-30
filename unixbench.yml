@@ -1,0 +1,11 @@
+version: "3"
+
+services:
+
+  unixbench:
+    image: tutum/unixbench
+    logging:
+      driver: gelf
+      options:
+        gelf-address: "udp://127.0.0.1:12201"
+        tag: "unixbench"

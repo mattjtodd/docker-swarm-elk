@@ -3,8 +3,6 @@ version: "3.3"
 networks:
   elasticsearch:
     driver: overlay
-  unixbench:
-    driver: overlay
 
 volumes:
   esdata:
@@ -117,16 +115,6 @@ services:
         target: /logstash/logstash-template.json
       - source: logstash-conf
         target: /logstash/logstash.conf
-
-  unixbench:
-    image: tutum/unixbench
-    networks:
-      - unixbench
-    logging:
-      driver: gelf
-      options:
-        gelf-address: "udp://127.0.0.1:12201"
-        tag: "unixbench"
     
 configs:
   metricbeat.yml:
