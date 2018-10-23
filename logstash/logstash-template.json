@@ -22,7 +22,7 @@
           "match" : "*",
           "match_mapping_type" : "string",
           "mapping" : {
-            "type" : "text", "norms" : false,
+            "type" : "keyword", "norms" : false,
             "fields" : {
               "keyword" : { "type": "keyword", "ignore_above": 256 }
             }
@@ -31,6 +31,7 @@
       } ],
       "properties" : {
         "@timestamp": { "type": "date"},
+        "body_bytes_sent": { "type": "integer"},
         "@version": { "type": "keyword"},
         "geoip"  : {
           "dynamic": true,
@@ -45,3 +46,4 @@
     }
   }
 }
+

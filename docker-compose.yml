@@ -10,6 +10,19 @@ volumes:
 
 services:
 
+  nginx:
+    image: nginx
+    ports:
+      - 80:80
+    configs:
+      - source: nginx-conf
+        target: /etc/nginx/nginx.conf
+    logging:
+      driver: gelf
+      options:
+        gelf-address: "udp://127.0.0.1:12201"
+        tag: "nginx"
+    
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:6.0.0
     environment:
@@ -58,7 +71,7 @@ services:
       - /:/hostfs:ro
       - /var/run/docker.sock:/var/run/docker.sock
     configs:
-      - metricbeat.yml
+      - metricbeat-conf
     deploy:
       mode: global
 
@@ -115,11 +128,13 @@ services:
         target: /logstash/logstash-template.json
       - source: logstash-conf
         target: /logstash/logstash.conf
-    
+
 configs:
-  metricbeat.yml:
+  metricbeat-conf:
     external: true
   logstash-template:
     external: true
   logstash-conf:  
+    external: true
+  nginx-conf:
     external: true
